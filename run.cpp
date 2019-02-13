@@ -11,63 +11,75 @@ double accelDrag(double v, double z) {
 double accelGravity(double z) {
     return -9.8 * pow( (1 + z / 6370000), -2);
 }
-double getXratio() {
-    
+double getXratio(double azimuth, double altitude) {
+    return cos(altitude) * sin(azimuth);
 }
-double getYratio() {
-    
+double getYratio(double azimuth, double altitude) {
+    return cos(altitude) * cos(azimuth);
 }
-double getZratio() {
-    
+double getZratio(double altitude) {
+    return sin(altitude);
 }
 
 int main() {
-    double az;
-    double alt;
+    double azimuth;
+    double altitude;
 
-    double x;
-    double y;
+    double x = 0;
+    double y = 0;
     double z = 30000;
 
     double v = 100;
-    double vx;
-    double vy;
-    double vz;
- 
+    double vx = getXratio(azimuth, altitude) * v;
+    double vy = getYratio(azimuth, altitude) * v;
+    double vz = getZratio(altitude) * v;
+
+    double a;
+    double ax = 0;
+    double ay = 0;
+    double az = accelGravity(z);
 
     double t = 0;
     double dt = 0.1; // step size
-    
-    double a = -9.8;
-    double ax;
-    double ay;
-    double az;
-
 
     ofstream data;
     data.open("data.csv");
 
-    double ap;
-    double ac;
+    double xp;
+    double xc;
+    double yp;
+    double yc;
     double zp;
     double zc;
-    double vp;
-    double vc;
 
+    double vxp;
+    double vxc;
+    double vyp;
+    double vyc;
+    double vzp;
+    double vzc;
+
+    double axp;
+    double axc;
+    double ayp;
+    double ayc;
+    double azp;
+    double azc;
+    
     while (z > 0) {
-        ap = (accelGravity(z) + accelDrag(v,z));
-        zp = z + v * dt;
-        vp = v + ap * dt;
+        azp = (accelGravity(z) + accelDrag(vz,z));
+        zp = z + vz * dt;
+        vzp = v + azp * dt;
     
         // corrector:
-        ac = (accelGravity(zp) + accelDrag(vp,zp));
-        zc = z + vp * dt;
-        vc = v + ac * dt;
+        azc = (accelGravity(zp) + accelDrag(vzp,zp));
+        zc = z + vzp * dt;
+        vzc = v + azc * dt;
 
         // Average solutions for final z value:
         z = 0.5 * (zp + zc);
-        v = 0.5 * (vp + vc);
-        a = 0.5 * (ap + ac);
+        v = 0.5 * (vzp + vzc);
+        a = 0.5 * (azp + azc);
 
         // To eliminate velocity-dependent forces, 
         // take the midpoint of the initial and final states using the predictor-corrector to give a final update to the velocity. 
