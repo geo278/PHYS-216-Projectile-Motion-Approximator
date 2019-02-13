@@ -5,7 +5,8 @@ using namespace std;
 
 
 double accelDrag(double v, double z) {
-    return -0.5 * pow(2.71828182846, (-1 * z / 8000)) * v * fabs(v) / 100;
+    double mass = 100;
+    return -0.5 * pow(2.71828182846, (-1 * z / 8000)) * v * fabs(v) / mass;
 }
 double accelGravity(double z) {
     return -9.8 * pow( (1 + z / 6370000), -2);
