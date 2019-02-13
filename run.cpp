@@ -20,6 +20,9 @@ double getYratio(double azimuth, double altitude) {
 double getZratio(double altitude) {
     return sin(altitude);
 }
+double getTotalFromComponents(double x, double y, double z) {
+    return sqrt (pow(x, 2) + pow(y, 2) + pow(z, 2));
+}
 
 int main() {
     double azimuth = 0.400 * 360;
@@ -53,6 +56,8 @@ int main() {
     double zp;
     double zc;
 
+    double vp;
+    double vc;
     double vxp;
     double vxc;
     double vyp;
@@ -60,6 +65,8 @@ int main() {
     double vzp;
     double vzc;
 
+    double ap;
+    double ac;
     double axp;
     double axc;
     double ayp;
@@ -68,20 +75,53 @@ int main() {
     double azc;
     
     while (z > 0) {
-        azp = (accelGravity(z) + accelDrag(vz,z));
+        ap = (accelGravity(z) + getTotalFromComponents(accelDrag(vx,z), accelDrag(vy,z), accelDrag(vz,z)));
+        axp;
+        ayp;
+        azp;
+
+        xp = x + vx * dt;
+        yp = y + vy * dt;
         zp = z + vz * dt;
-        vzp = v + azp * dt;
+
+        vp = v + ap * dt;
+        vxp;
+        vyp;
+        vzp;
+
+        
     
+
+
         // corrector:
-        azc = (accelGravity(zp) + accelDrag(vzp,zp));
+        ac = (accelGravity(zp) + getTotalFromComponents(accelDrag(vxp,zp), accelDrag(vyp,zp), accelDrag(vzp,zp)));
+
+
+        xc = z + vzp * dt;
+        yc = z + vzp * dt;
         zc = z + vzp * dt;
-        vzc = v + azc * dt;
+
+        
+        vc = v + azc * dt;
+
+
 
         // Average solutions for final z value:
+        x = 0.5 * (xp + xc);
+        y = 0.5 * (yp + yc);
         z = 0.5 * (zp + zc);
-        v = 0.5 * (vzp + vzc);
-        a = 0.5 * (azp + azc);
 
+        v = 0.5 * (vp + vc);
+        vx = 0.5 * (vxp + vxc);
+        vy = 0.5 * (vyp + vyc);
+        vz = 0.5 * (vzp + vzc);
+
+        a = 0.5 * (ap + ac);
+        ax = 0.5 * (axp + axc);
+        ay = 0.5 * (ayp + ayc);
+        az = 0.5 * (azp + azc);
+        
+        // outdated: 
         // To eliminate velocity-dependent forces, 
         // take the midpoint of the initial and final states using the predictor-corrector to give a final update to the velocity. 
         // z0 = z * 1;
@@ -91,7 +131,7 @@ int main() {
         // a = (accelGravity(zm) + accelDrag(vm,zm));
         // v = v0 + a * dt;
 
-        range = sqrt (pow(x, 2) + pow(y, 2));
+        range = getTotalFromComponents(x, y, 0);
         t += dt;
 
         if (z < 1) {
