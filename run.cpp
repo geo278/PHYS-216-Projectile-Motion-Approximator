@@ -44,7 +44,7 @@ int main() {
     double az = accelGravity(z);
 
     double t = 0;
-    double dt = 0.1; // step size
+    double dt = 0.01; // step size
 
     ofstream data;
     data.open("data.csv");
@@ -75,10 +75,10 @@ int main() {
     double azc;
     
     while (z > 0) {
-        ap = (accelGravity(z) + getTotalFromComponents(accelDrag(vx,z), accelDrag(vy,z), accelDrag(vz,z)));
-        axp = (accelGravity(z) + accelDrag(vx,z));
-        ayp = (accelGravity(z) + accelDrag(vy,z));
-        azp = (accelGravity(z) + accelDrag(vz,z));
+        ap = getTotalFromComponents(accelDrag(vx,z), accelDrag(vy,z), accelGravity(z) + accelDrag(vz,z));
+        axp = accelDrag(vx,z);
+        ayp = accelDrag(vy,z);
+        azp = accelGravity(z) + accelDrag(vz,z);
 
         xp = x + vx * dt;
         yp = y + vy * dt;
@@ -94,9 +94,9 @@ int main() {
 
 
         // corrector:
-        ac = (accelGravity(zp) + getTotalFromComponents(accelDrag(vxp,zp), accelDrag(vyp,zp), accelDrag(vzp,zp)));
-        axc = (accelGravity(zp) + accelDrag(vxp,zp));
-        ayc = (accelGravity(zp) + accelDrag(vyp,zp));
+        ac = (getTotalFromComponents(accelDrag(vxp,zp), accelDrag(vyp,zp), accelGravity(zp) + accelDrag(vzp,zp)));
+        axc = (accelDrag(vxp,zp));
+        ayc = (accelDrag(vyp,zp));
         azc = (accelGravity(zp) + accelDrag(vzp,zp));
 
         xc = z + vzp * dt;
