@@ -22,12 +22,13 @@ double getZratio(double altitude) {
 }
 
 int main() {
-    double azimuth;
-    double altitude;
+    double azimuth = 0.400 * 360;
+    double altitude = 0.400 * 70;
 
+    double range = 0;
     double x = 0;
     double y = 0;
-    double z = 30000;
+    double z = 4;
 
     double v = 100;
     double vx = getXratio(azimuth, altitude) * v;
@@ -90,19 +91,18 @@ int main() {
         // a = (accelGravity(zm) + accelDrag(vm,zm));
         // v = v0 + a * dt;
 
+        range = sqrt (pow(x, 2) + pow(y, 2));
         t += dt;
 
         if (z < 1) {
-            cout<<" fall time: "<<t;
-            cout<<" fall position: "<<z;
-            cout<<" fall speed: "<<v;
-            cout<<" fall accel: "<<a;
+            cout<<"  time: "<<t;
+            cout<<"  range: "<<range;
+            cout<<"  height: "<<z;
+            cout<<"  speed: "<<v;
+            cout<<"  accel: "<<a;
         }
 
-        data << t << "," << z << "," << v << "," << a << endl;
+        data << t <<","<< range <<","<< z <<","<< v <<","<< a << endl;
     }
-
-    double range = sqrt (pow(x, 2) + pow(y, 2));
-
     return 1;
 }
