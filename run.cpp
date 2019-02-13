@@ -5,20 +5,44 @@ using namespace std;
 
 
 double accelDrag(double v, double z) {
-    double mass = 100;
-    return -0.5 * pow(2.71828182846, (-1 * z / 8000)) * v * fabs(v) / mass;
+    double mass = 10;
+    return -0.043 * pow(2.71828182846, (-1 * z / 8000)) * v * fabs(v) / mass;
 }
 double accelGravity(double z) {
     return -9.8 * pow( (1 + z / 6370000), -2);
 }
+double getXratio() {
+    
+}
+double getYratio() {
+    
+}
+double getZratio() {
+    
+}
 
-int main() {   
+int main() {
+    double az;
+    double alt;
+
+    double x;
+    double y;
     double z = 30000;
 
-    double v = 0;
+    double v = 100;
+    double vx;
+    double vy;
+    double vz;
+ 
+
     double t = 0;
     double dt = 0.1; // step size
+    
     double a = -9.8;
+    double ax;
+    double ay;
+    double az;
+
 
     ofstream data;
     data.open("data.csv");
@@ -31,12 +55,6 @@ int main() {
     double vc;
 
     while (z > 0) {
-        // euler step:
-        // a = ( accelGravity(z) + accelDrag(v,z) );
-        // z += v * dt;
-        // v += a * dt;
-        // t += dt;
-
         ap = (accelGravity(z) + accelDrag(v,z));
         zp = z + v * dt;
         vp = v + ap * dt;
@@ -52,8 +70,7 @@ int main() {
         a = 0.5 * (ap + ac);
 
         // To eliminate velocity-dependent forces, 
-        // take the midpoint of the initial and final states using the predictor-corrector, 
-        // and use that to give a final update to the velocity. 
+        // take the midpoint of the initial and final states using the predictor-corrector to give a final update to the velocity. 
         // z0 = z * 1;
         // v0 = v * 1;
         // zm = 0.5 * (z + z0);
@@ -72,6 +89,8 @@ int main() {
 
         data << t << "," << z << "," << v << "," << a << endl;
     }
+
+    double range = sqrt (pow(x, 2) + pow(y, 2));
 
     return 1;
 }
