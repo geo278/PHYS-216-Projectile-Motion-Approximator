@@ -75,10 +75,10 @@ int main() {
     double azc;
     
     while (z > 0) {
-        ap = getTotalFromComponents(accelDrag(vx,z), accelDrag(vy,z), accelGravity(z) + accelDrag(vz,z));
         axp = accelDrag(vx,z);
         ayp = accelDrag(vy,z);
         azp = accelGravity(z) + accelDrag(vz,z);
+        ap = getTotalFromComponents(axp, ayp, azp);
 
         xp = x + vx * dt;
         yp = y + vy * dt;
@@ -89,18 +89,15 @@ int main() {
         vyp = vy + ayp * dt;
         vzp = vz + azp * dt;
 
-        
-    
-
 
         // corrector:
-        ac = (getTotalFromComponents(accelDrag(vxp,zp), accelDrag(vyp,zp), accelGravity(zp) + accelDrag(vzp,zp)));
         axc = (accelDrag(vxp,zp));
         ayc = (accelDrag(vyp,zp));
         azc = (accelGravity(zp) + accelDrag(vzp,zp));
-
-        xc = z + vzp * dt;
-        yc = z + vzp * dt;
+        ac = getTotalFromComponents(axc, ayc, azc);
+        
+        xc = x + vzp * dt;
+        yc = y + vzp * dt;
         zc = z + vzp * dt;
 
         
