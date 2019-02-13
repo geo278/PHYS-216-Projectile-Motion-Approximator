@@ -72,7 +72,5 @@ int main() {
         data << t << "," << z << "," << v << "," << a << endl;
     }
 
-
-
     return 1;
 }
