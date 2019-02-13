@@ -76,18 +76,18 @@ int main() {
     
     while (z > 0) {
         ap = (accelGravity(z) + getTotalFromComponents(accelDrag(vx,z), accelDrag(vy,z), accelDrag(vz,z)));
-        axp;
-        ayp;
-        azp;
+        axp = (accelGravity(z) + accelDrag(vx,z));
+        ayp = (accelGravity(z) + accelDrag(vy,z));
+        azp = (accelGravity(z) + accelDrag(vz,z));
 
         xp = x + vx * dt;
         yp = y + vy * dt;
         zp = z + vz * dt;
 
         vp = v + ap * dt;
-        vxp;
-        vyp;
-        vzp;
+        vxp = vx + axp * dt;
+        vyp = vy + ayp * dt;
+        vzp = vz + azp * dt;
 
         
     
@@ -95,7 +95,9 @@ int main() {
 
         // corrector:
         ac = (accelGravity(zp) + getTotalFromComponents(accelDrag(vxp,zp), accelDrag(vyp,zp), accelDrag(vzp,zp)));
-
+        axc = (accelGravity(zp) + accelDrag(vxp,zp));
+        ayc = (accelGravity(zp) + accelDrag(vyp,zp));
+        azc = (accelGravity(zp) + accelDrag(vzp,zp));
 
         xc = z + vzp * dt;
         yc = z + vzp * dt;
@@ -103,7 +105,9 @@ int main() {
 
         
         vc = v + azc * dt;
-
+        vxc = vx + axc * dt;
+        vyc = vy + ayc * dt;
+        vzc = vz + azc * dt;
 
 
         // Average solutions for final z value:
