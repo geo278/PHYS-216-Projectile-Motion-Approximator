@@ -138,6 +138,9 @@ int main() {
         if (z < 1) {
             cout<<"  time: "<<t;
             cout<<"  range: "<<range;
+            cout<<"  vx: "<<vx;
+            cout<<"  vy: "<<vy;
+            cout<<"  vz: "<<vz;
             cout<<"  height: "<<z;
             cout<<"  speed: "<<v;
             cout<<"  accel: "<<a;
