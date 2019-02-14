@@ -146,7 +146,7 @@ int main() {
             cout<<"  accel: "<<a;
         }
 
-        data << t <<","<< range <<","<< z <<","<< v <<","<< a << endl;
+        data << range <<","<< z <<","<< t <<","<< az <<","<< v << endl;
     }
     return 1;
 }
