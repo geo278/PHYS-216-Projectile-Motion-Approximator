@@ -29,6 +29,7 @@ int main() {
     double azimuth = 0.400 * 360;
     double altitude = 0.400 * 70;
 
+    // the x direction is aligned along east,y along north, and z along height.
     double range = 0;
     double x = 0;
     double y = 0;
