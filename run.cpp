@@ -144,6 +144,8 @@ int main() {
             cout<<"  height: "<<z;
             cout<<"  speed: "<<v;
             cout<<"  accel: "<<a;
+            cout<<"  x: "<<x;
+            cout<<"  y: "<<y;
         }
 
         data << range <<","<< z <<","<< t <<","<< az <<","<< v << endl;
