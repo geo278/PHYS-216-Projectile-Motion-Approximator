@@ -24,6 +24,8 @@ double getTotalFromComponents(double x, double y, double z) {
 }
 
 int main() {
+    // TAN 54 DEGREES IS 1.37, MY RATIO IS DEFINITLY WRONG
+
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
     double azimuth = 144;
     double altitude = 28;
