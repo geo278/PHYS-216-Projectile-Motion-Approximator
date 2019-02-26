@@ -96,12 +96,12 @@ int main() {
         azc = (accelGravity(zp) + accelDrag(vzp,zp));
         ac = getTotalFromComponents(axc, ayc, azc);
         
-        xc = x + vzp * dt;
-        yc = y + vzp * dt;
+        xc = x + vxp * dt;
+        yc = y + vyp * dt;
         zc = z + vzp * dt;
 
         
-        vc = v + azc * dt;
+        vc = v + ac * dt;
         vxc = vx + axc * dt;
         vyc = vy + ayc * dt;
         vzc = vz + azc * dt;
