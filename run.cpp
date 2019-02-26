@@ -86,11 +86,10 @@ int main() {
         yp = y + vy * dt;
         zp = z + vz * dt;
 
-        vp = v + ap * dt;
         vxp = vx + axp * dt;
         vyp = vy + ayp * dt;
         vzp = vz + azp * dt;
-
+        vp = getTotalFromComponents(vxp, vyp, vzp);
 
         // corrector:
         axc = (accelDrag(vxp,zp));
@@ -102,11 +101,10 @@ int main() {
         yc = y + vyp * dt;
         zc = z + vzp * dt;
 
-        vc = v + ac * dt;
         vxc = vx + axc * dt;
         vyc = vy + ayc * dt;
         vzc = vz + azc * dt;
-
+        vc = getTotalFromComponents(vxc, vyc, vzc);
 
         // Average solutions for final z value:
         x = 0.5 * (xp + xc);
