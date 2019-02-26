@@ -41,9 +41,9 @@ int main() {
     double vz = getZratio(altitude) * v;
 
     double a;
-    double ax = 0;
-    double ay = 0;
-    double az = accelGravity(z);
+    double ax = accelDrag(vx,z);
+    double ay = accelDrag(vy,z);
+    double az = accelGravity(z) + accelDrag(vz,z);
 
     double t = 0;
     double dt = 0.01; // step size
@@ -102,7 +102,6 @@ int main() {
         yc = y + vyp * dt;
         zc = z + vzp * dt;
 
-        
         vc = v + ac * dt;
         vxc = vx + axc * dt;
         vyc = vy + ayc * dt;
