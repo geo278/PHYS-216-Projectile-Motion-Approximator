@@ -53,21 +53,21 @@ int main() {
     ofstream data;
     data.open("data.csv");
 
-    double xp;
-    double xc;
-    double yp;
-    double yc;
-    double zp;
-    double zc;
+    double xp = 0;
+    double xc = 0;
+    double yp = 0;
+    double yc = 0;
+    double zp = 4;
+    double zc = 4;
 
-    double vp;
-    double vc;
-    double vxp;
-    double vxc;
-    double vyp;
-    double vyc;
-    double vzp;
-    double vzc;
+    double vp = v;
+    double vc = v;
+    double vxp = vx;
+    double vxc = vx;
+    double vyp = vy;
+    double vyc = vy;
+    double vzp = vz;
+    double vzc = vz;
 
     double ap;
     double ac;
@@ -79,6 +79,32 @@ int main() {
     double azc;
     
     while (z > 0) {
+//  while r[2]>0 or it==0:
+//         # first take trial step
+//         a = acceleration(r,v,mass)
+//         for i in range(3):
+//             rp[i]=r[i]+v[i]*dt
+//             vp[i]=v[i]+a[i]*dt
+    
+//         # now add a corrector, which is just an estimate using the acceleration at the end of the trial step
+//         ap = acceleration(rp,vp,mass)
+//         for i in range(3):
+//             rc[i] = r[i]+vp[i]*dt
+//             vc[i] = v[i]+ap[i]*dt
+
+//         ac = acceleration(rc,vc,mass) # this step is mainly for record keeping
+//         # now average the solutions for final z estimate
+
+//         # this is just a shortcut to ensure the new array is not just a pointer to the old array
+//         r0=r*1
+//         v0=v*1
+
+//         r = 0.5*(rp+rc)
+//         v = 0.5*(vp+vc)
+//         a = 0.5*(ap+ac)
+
+//         t+=dt
+
         double dragTerm = accelDrag(v, z, mass);
         ax = dragTerm*vx;
         ay = dragTerm*vy;
@@ -93,8 +119,6 @@ int main() {
         vyp = vy + ay * dt;
         vzp = vz + az * dt;
         vc = getTotalFromComponents(vxp, vyp, vzp);
-
-
 
         // corrector:
 
