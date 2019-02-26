@@ -25,6 +25,7 @@ double getTotalFromComponents(double x, double y, double z) {
 }
 
 int main() {
+    // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
     double azimuth = 0.400 * 360;
     double altitude = 0.400 * 70;
 
