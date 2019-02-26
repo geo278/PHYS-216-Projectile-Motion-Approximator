@@ -4,9 +4,8 @@
 using namespace std;
 
 
-double accelDrag(double v, double z) {
-    double mass = 10;
-    return -0.043 * pow(2.71828182846, (-1 * z / 8000)) * v * fabs(v) / mass;
+double accelDrag(double v, double z, double mass) {
+    return -0.043 * pow(2.71828182846, (-1 * z / 8000)) * fabs(v) / mass;
 }
 double accelGravity(double z) {
     return -9.8 * pow( (1 + z / 6370000), -2);
@@ -29,6 +28,9 @@ int main() {
     double azimuth = 144;
     double altitude = 28;
 
+    //double DragCoefficient1 = 0.043;
+    double mass = 10;
+
     // the x direction is aligned along east,y along north, and z along height.
     double range = 0;
     double x = 0;
@@ -41,9 +43,9 @@ int main() {
     double vz = getZratio(altitude) * v;
 
     double a;
-    double ax = accelDrag(vx,z);
-    double ay = accelDrag(vy,z);
-    double az = accelGravity(z) + accelDrag(vz,z);
+    double ax;
+    double ay;
+    double az;
 
     double t = 0;
     double dt = 0.01; // step size
@@ -77,38 +79,47 @@ int main() {
     double azc;
     
     while (z > 0) {
-        axp = accelDrag(vx,z);
-        ayp = accelDrag(vy,z);
-        azp = accelGravity(z) + accelDrag(vz,z);
-        ap = getTotalFromComponents(axp, ayp, azp);
+        double dragTerm = accelDrag(v, z, mass);
+        ax = dragTerm*vx;
+        ay = dragTerm*vy;
+        az = dragTerm*vz + accelGravity(z);
+        a = getTotalFromComponents(ax, ay, az);
 
         xp = x + vx * dt;
         yp = y + vy * dt;
         zp = z + vz * dt;
 
-        vp = v + ap * dt;
-        vxp = vx + axp * dt;
-        vyp = vy + ayp * dt;
-        vzp = vz + azp * dt;
+        vxp = vx + ax * dt;
+        vyp = vy + ay * dt;
+        vzp = vz + az * dt;
+        vc = getTotalFromComponents(vxp, vyp, vzp);
+
 
 
         // corrector:
-        axc = (accelDrag(vxp,zp));
-        ayc = (accelDrag(vyp,zp));
-        azc = (accelGravity(zp) + accelDrag(vzp,zp));
-        ac = getTotalFromComponents(axc, ayc, azc);
+
+        dragTerm = accelDrag(vp, zp, mass);
+        axp = dragTerm*vxp;
+        ayp = dragTerm*vyp;
+        azp = dragTerm*vzp + accelGravity(zp);
+        ap = getTotalFromComponents(axp, ayp, azp);
         
         xc = x + vxp * dt;
         yc = y + vyp * dt;
         zc = z + vzp * dt;
 
-        vc = v + ac * dt;
-        vxc = vx + axc * dt;
-        vyc = vy + ayc * dt;
-        vzc = vz + azc * dt;
+        vxc = vx + axp * dt;
+        vyc = vy + ayp * dt;
+        vzc = vz + azp * dt;
+        vc = getTotalFromComponents(vxc, vyc, vzc);
+//
+        dragTerm = accelDrag(vc, zc, mass);
+        axc = dragTerm*vxc;
+        ayc = dragTerm*vyc;
+        azc = dragTerm*vzc + accelGravity(zc);
+        ac = getTotalFromComponents(axc, ayc, azc);
 
-
-        // Average solutions for final z value:
+        // Average solutions for final values:
         x = 0.5 * (xp + xc);
         y = 0.5 * (yp + yc);
         z = 0.5 * (zp + zc);
