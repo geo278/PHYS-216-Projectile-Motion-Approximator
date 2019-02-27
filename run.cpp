@@ -2,52 +2,86 @@
 #include <math.h>
 #include <fstream>
 using namespace std;
+#define PI 3.14159265
 
+double getTotalFromComponents(double * vector) {
+    return sqrt (pow(vector[0], 2) + pow(vector[1], 2) + pow(vector[2], 2));
+}
+double accelGravity(double * a) {
+    return -9.8 * pow( (1 + a[2] / 6370000), -2);
+}
+double * accel(double * v, double * r, double mass, double b) {
+        static double a[3] = {0, 0, 0};
+        double Vabs=getTotalFromComponents(v);
+        double multiple = -b * pow(2.71828182846, (-1 * r[2] / 8000)) * Vabs / mass;
+        a[0] = multiple * v[0];
+        a[1] = multiple * v[1];
+        a[2] = multiple * v[2] + accelGravity(r);
+        return a;
+}
+// double getXratio(double azimuth, double altitude) {
+//     return cos(altitude) * sin(azimuth);
+// }
+// double getYratio(double azimuth, double altitude) {
+//     return cos(altitude) * cos(azimuth);
+// }
+// double getZratio(double altitude) {
+//     return sin(altitude);
+// }
+    // def Rx(v,a):
+    //     '''v is a general vector in this case'''
+    //     s=np.zeros(3)
+    //     s[0] = v[0]
+    //     s[1] = np.cos(a)*v[1] -np.sin(a)*v[2]
+    //     s[2] = np.sin(a)*v[1] +np.cos(a)*v[2]
+    //     return s
 
-double accelDrag(double v, double z, double mass) {
-    return -0.043 * pow(2.71828182846, (-1 * z / 8000)) * fabs(v) / mass;
-}
-double accelGravity(double z) {
-    return -9.8 * pow( (1 + z / 6370000), -2);
-}
-double getXratio(double azimuth, double altitude) {
-    return cos(altitude) * sin(azimuth);
-}
-double getYratio(double azimuth, double altitude) {
-    return cos(altitude) * cos(azimuth);
-}
-double getZratio(double altitude) {
-    return sin(altitude);
-}
-double getTotalFromComponents(double x, double y, double z) {
-    return sqrt (pow(x, 2) + pow(y, 2) + pow(z, 2));
-}
+    double * rotateX(double * v, double angle) {
+        static double s[3] = {0, 0, 0};
+        s[0] = v[0];
+        s[1] = cos(angle) * v[1] - sin(angle) * v[2];
+        s[2] = sin(angle) * v[1] + cos(angle) * v[2];
+        return s;
+    }
+    double * rotateZ(double * v, double angle) {
+        static double s[3] = {0, 0, 0};
+        s[0] = cos(angle) * v[0] - sin(angle) * v[1];
+        s[1] = sin(angle) * v[0] + cos(angle) * v[1];
+        s[2] = v[2];
+        return s;
+    }
 
 int main() {
     // TAN 54 DEGREES IS 1.37, MY RATIO IS DEFINITLY WRONG
 
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
-    double azimuth = 144;
-    double altitude = 28;
+    double azimuth = 144*PI/180;
+    double altitude = 28*PI/180;
 
-    //double DragCoefficient1 = 0.043;
     double mass = 10;
-
+    double b = 0.043;
     // the x direction is aligned along east,y along north, and z along height.
     double range = 0;
-    double x = 0;
-    double y = 0;
-    double z = 4;
 
-    double v = 100;
-    double vx = getXratio(azimuth, altitude) * v;
-    double vy = getYratio(azimuth, altitude) * v;
-    double vz = getZratio(altitude) * v;
+    double * r = new double[3];
+    r[0] = 0;
+    r[1] = 0;
+    r[2] = 4;
 
-    double a;
-    double ax;
-    double ay;
-    double az;
+    double * v = new double[3];
+    v[0] = 0;
+    v[1] = 100;
+    v[2] = 0;
+    v = rotateX(v, altitude);
+    v = rotateZ(v, -azimuth);
+
+    // double vx = getXratio(azimuth, altitude) * v;
+    // double vy = getYratio(azimuth, altitude) * v;
+    // double vz = getZratio(altitude) * v;
+    double * a = new double[3];
+    a[0] = 0;
+    a[1] = 0;
+    a[2] = 0;
 
     double t = 0;
     double dt = 0.01; // step size
@@ -55,138 +89,75 @@ int main() {
     ofstream data;
     data.open("data.csv");
 
-    double xp = 0;
-    double xc = 0;
-    double yp = 0;
-    double yc = 0;
-    double zp = 4;
-    double zc = 4;
+    double * rp = new double[3];
+    double * rc = new double[3];
 
-    double vp = v;
-    double vc = v;
-    double vxp = vx;
-    double vxc = vx;
-    double vyp = vy;
-    double vyc = vy;
-    double vzp = vz;
-    double vzc = vz;
+    double * vp = new double[3];
+    double * vc = new double[3];
 
-    double ap;
-    double ac;
-    double axp;
-    double axc;
-    double ayp;
-    double ayc;
-    double azp;
-    double azc;
-    
-    while (z > 0) {
-//  while r[2]>0 or it==0:
-//         # first take trial step
-//         a = acceleration(r,v,mass)
-//         for i in range(3):
-//             rp[i]=r[i]+v[i]*dt
-//             vp[i]=v[i]+a[i]*dt
-    
-//         # now add a corrector, which is just an estimate using the acceleration at the end of the trial step
-//         ap = acceleration(rp,vp,mass)
-//         for i in range(3):
-//             rc[i] = r[i]+vp[i]*dt
-//             vc[i] = v[i]+ap[i]*dt
+    double * ap = new double[3];
+    double * ac = new double[3];
 
-//         ac = acceleration(rc,vc,mass) # this step is mainly for record keeping
-//         # now average the solutions for final z estimate
-
-//         # this is just a shortcut to ensure the new array is not just a pointer to the old array
-//         r0=r*1
-//         v0=v*1
-
-//         r = 0.5*(rp+rc)
-//         v = 0.5*(vp+vc)
-//         a = 0.5*(ap+ac)
-
-//         t+=dt
-
-        double dragTerm = accelDrag(v, z, mass);
-        ax = dragTerm*vx;
-        ay = dragTerm*vy;
-        az = dragTerm*vz + accelGravity(z);
-        a = getTotalFromComponents(ax, ay, az);
-
-        xp = x + vx * dt;
-        yp = y + vy * dt;
-        zp = z + vz * dt;
-
-        vxp = vx + ax * dt;
-        vyp = vy + ay * dt;
-        vzp = vz + az * dt;
-        vc = getTotalFromComponents(vxp, vyp, vzp);
-
-        // corrector:
-
-        dragTerm = accelDrag(vp, zp, mass);
-        axp = dragTerm*vxp;
-        ayp = dragTerm*vyp;
-        azp = dragTerm*vzp + accelGravity(zp);
-        ap = getTotalFromComponents(axp, ayp, azp);
-        
-        xc = x + vxp * dt;
-        yc = y + vyp * dt;
-        zc = z + vzp * dt;
-
-        vxc = vx + axp * dt;
-        vyc = vy + ayp * dt;
-        vzc = vz + azp * dt;
-        vc = getTotalFromComponents(vxc, vyc, vzc);
-//
-        dragTerm = accelDrag(vc, zc, mass);
-        axc = dragTerm*vxc;
-        ayc = dragTerm*vyc;
-        azc = dragTerm*vzc + accelGravity(zc);
-        ac = getTotalFromComponents(axc, ayc, azc);
-
-        // Average solutions for final values:
-        x = 0.5 * (xp + xc);
-        y = 0.5 * (yp + yc);
-        z = 0.5 * (zp + zc);
-
-        v = 0.5 * (vp + vc);
-        vx = 0.5 * (vxp + vxc);
-        vy = 0.5 * (vyp + vyc);
-        vz = 0.5 * (vzp + vzc);
-
-        a = 0.5 * (ap + ac);
-        ax = 0.5 * (axp + axc);
-        ay = 0.5 * (ayp + ayc);
-        az = 0.5 * (azp + azc);
-        
-        // outdated: 
-        // To eliminate velocity-dependent forces, 
-        // take the midpoint of the initial and final states using the predictor-corrector to give a final update to the velocity. 
-        // z0 = z * 1;
-        // v0 = v * 1;
-        // zm = 0.5 * (z + z0);
-        // vm = 0.5 * (v + v0);
-        // a = (accelGravity(zm) + accelDrag(vm,zm));
-        // v = v0 + a * dt;
-
-        range = getTotalFromComponents(x, y, 0);
-        t += dt;
-
-        if (z < 1) {
-            cout<<"  time: "<<t;
-            cout<<"  range: "<<range;
-            cout<<"  vx: "<<vx;
-            cout<<"  vy: "<<vy;
-            cout<<"  vz: "<<vz;
-            cout<<"  height: "<<z;
-            cout<<"  speed: "<<v;
-            cout<<"  accel: "<<a;
-            cout<<"  x: "<<x;
-            cout<<"  y: "<<y;
+    while (r[2] > 0) {
+        a = accel(v, r, mass, b);
+        for (int i = 0; i < 3; i++) {
+            rp[i] = r[i] + v[i] * dt;
+            vp[i] = v[i] + a[i] * dt;
         }
 
-        data << range <<","<< z <<","<< t <<","<< az <<","<< v << endl;
+        // corrector:
+        ap = accel(vp, rp, mass, b);
+        for (int i = 0; i < 3; i++) {
+            rc[i] = r[i] + vp[i] * dt;
+            vc[i] = v[i] + ap[i] * dt;
+        }
+//
+        ac = accel(vc, rc, mass, b);
+
+        // Average solutions for final values:
+        for (int i = 0; i < 3; i++) {
+            r[i] = 0.5 * (rp[i] + rc[i]);
+            v[i] = 0.5 * (vp[i] + vc[i]);
+            a[i] = 0.5 * (ap[i] + ac[i]);
+        }
+
+        range = sqrt(r[0]*r[0] + r[1]*r[1]);
+        t += dt;
+
+        double zzz[3] = {2, 3, 6};
+        if (r[2] < 1) {
+            cout<<"  time: "<<t;
+            cout<<"  range: "<<range;
+            cout<<"  vx: "<<v[0];
+            cout<<"  vy: "<<v[1];
+            cout<<"  vz: "<<v[2];
+            cout<<"  velocity: "<<getTotalFromComponents(v);
+            cout<<"  accel: "<<getTotalFromComponents(a);
+            cout<<"  x: "<<r[0];
+            cout<<"  y: "<<r[1];
+            cout<<"  height: "<<r[2];
+        }
+
+        data << range <<","<< r[2] <<","<< t <<","<< getTotalFromComponents(a) <<","<< getTotalFromComponents(v) << endl;
+
+        // delete [] r;
+        // r = NULL;
+        // delete [] v;
+        // v = NULL;
+        // delete [] a;
+        // a = NULL;
+        // delete [] rp;
+        // rp = NULL;
+        // delete [] rc;
+        // rc = NULL;
+        // delete [] vp;
+        // vp = NULL;
+        // delete [] vc;
+        // vc = NULL;
+        // delete [] ap;
+        // ap = NULL;
+        // delete [] ac;
+        // ac = NULL;
     }
     return 1;
 }

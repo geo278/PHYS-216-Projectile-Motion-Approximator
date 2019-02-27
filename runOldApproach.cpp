@@ -2,7 +2,7 @@
 #include <math.h>
 #include <fstream>
 using namespace std;
-
+#define PI 3.14159265
 
 double accelDrag(double v, double z) {
     double mass = 10;
@@ -26,8 +26,8 @@ double getTotalFromComponents(double x, double y, double z) {
 
 int main() {
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
-    double azimuth = 144;
-    double altitude = 28;
+    double azimuth = 144*PI/180;
+    double altitude = 28*PI/180;
 
     // the x direction is aligned along east,y along north, and z along height.
     double range = 0;
