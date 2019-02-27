@@ -19,41 +19,32 @@ double * accel(double * v, double * r, double mass, double b) {
         a[2] = multiple * v[2] + accelGravity(r);
         return a;
 }
-// double getXratio(double azimuth, double altitude) {
-//     return cos(altitude) * sin(azimuth);
-// }
-// double getYratio(double azimuth, double altitude) {
-//     return cos(altitude) * cos(azimuth);
-// }
-// double getZratio(double altitude) {
-//     return sin(altitude);
-// }
-    // def Rx(v,a):
-    //     '''v is a general vector in this case'''
-    //     s=np.zeros(3)
-    //     s[0] = v[0]
-    //     s[1] = np.cos(a)*v[1] -np.sin(a)*v[2]
-    //     s[2] = np.sin(a)*v[1] +np.cos(a)*v[2]
-    //     return s
+double getXratio(double azimuth, double altitude) {
+    return cos(altitude) * sin(azimuth);
+}
+double getYratio(double azimuth, double altitude) {
+    return cos(altitude) * cos(azimuth);
+}
+double getZratio(double altitude) {
+    return sin(altitude);
+}
 
-    double * rotateX(double * v, double angle) {
-        static double s[3] = {0, 0, 0};
-        s[0] = v[0];
-        s[1] = cos(angle) * v[1] - sin(angle) * v[2];
-        s[2] = sin(angle) * v[1] + cos(angle) * v[2];
-        return s;
-    }
-    double * rotateZ(double * v, double angle) {
-        static double s[3] = {0, 0, 0};
-        s[0] = cos(angle) * v[0] - sin(angle) * v[1];
-        s[1] = sin(angle) * v[0] + cos(angle) * v[1];
-        s[2] = v[2];
-        return s;
-    }
+    // double * rotateX(double * v, double angle) {
+    //     static double s[3] = {0, 0, 0};
+    //     s[0] = v[0];
+    //     s[1] = cos(angle) * v[1] - sin(angle) * v[2];
+    //     s[2] = sin(angle) * v[1] + cos(angle) * v[2];
+    //     return s;
+    // }
+    // double * rotateZ(double * v, double angle) {
+    //     static double s[3] = {0, 0, 0};
+    //     s[0] = cos(angle) * v[0] - sin(angle) * v[1];
+    //     s[1] = sin(angle) * v[0] + cos(angle) * v[1];
+    //     s[2] = v[2];
+    //     return s;
+    // }
 
 int main() {
-    // TAN 54 DEGREES IS 1.37, MY RATIO IS DEFINITLY WRONG
-
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
     double azimuth = 144*PI/180;
     double altitude = 28*PI/180;
@@ -69,15 +60,11 @@ int main() {
     r[2] = 4;
 
     double * v = new double[3];
-    v[0] = 0;
-    v[1] = 100;
-    v[2] = 0;
-    v = rotateX(v, altitude);
-    v = rotateZ(v, -azimuth);
+    double Vmag = 100;
+    v[0] = getXratio(azimuth, altitude) * Vmag;
+    v[1] = getYratio(azimuth, altitude) * Vmag;
+    v[2] = getZratio(altitude) * Vmag;
 
-    // double vx = getXratio(azimuth, altitude) * v;
-    // double vy = getYratio(azimuth, altitude) * v;
-    // double vz = getZratio(altitude) * v;
     double * a = new double[3];
     a[0] = 0;
     a[1] = 0;
@@ -111,7 +98,7 @@ int main() {
             rc[i] = r[i] + vp[i] * dt;
             vc[i] = v[i] + ap[i] * dt;
         }
-//
+
         ac = accel(vc, rc, mass, b);
 
         // Average solutions for final values:
