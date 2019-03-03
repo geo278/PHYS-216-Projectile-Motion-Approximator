@@ -31,21 +31,6 @@ double getZratio(double altitude) {
     return sin(altitude);
 }
 
-    // double * rotateX(double * v, double angle) {
-    //     static double s[3] = {0, 0, 0};
-    //     s[0] = v[0];
-    //     s[1] = cos(angle) * v[1] - sin(angle) * v[2];
-    //     s[2] = sin(angle) * v[1] + cos(angle) * v[2];
-    //     return s;
-    // }
-    // double * rotateZ(double * v, double angle) {
-    //     static double s[3] = {0, 0, 0};
-    //     s[0] = cos(angle) * v[0] - sin(angle) * v[1];
-    //     s[1] = sin(angle) * v[0] + cos(angle) * v[1];
-    //     s[2] = v[2];
-    //     return s;
-    // }
-
 int main() {
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
     double azimuth = 144*PI/180;
@@ -128,15 +113,12 @@ int main() {
         }
 
         data << range <<","<< r[2] <<","<< t <<","<< getTotalFromComponents(a) <<","<< getTotalFromComponents(v) << endl;
-
-
     }
+
     delete [] r;
     r = NULL;
     delete [] v;
     v = NULL;
-    // delete [] a;
-    // a = NULL;
     delete [] rp;
     rp = NULL;
     delete [] rc;
@@ -145,6 +127,10 @@ int main() {
     vp = NULL;
     delete [] vc;
     vc = NULL;
+
+    // acceleration arrays are static, and do not need to be freed
+    // delete [] a;
+    // a = NULL;
     // delete [] ap;
     // ap = NULL;
     // delete [] ac;
