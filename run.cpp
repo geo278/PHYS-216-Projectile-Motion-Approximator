@@ -7,16 +7,16 @@ using namespace std;
 double getTotalFromComponents(double * vector) {
     return sqrt (pow(vector[0], 2) + pow(vector[1], 2) + pow(vector[2], 2));
 }
-double accelGravity(double * a) {
-    return -9.8 * pow( (1 + a[2] / 6370000), -2);
+double accelGravity(double * r) {
+    return -9.8 * pow( (1 + r[2] / 6370000), -2);
 }
 double * accel(double * v, double * r, double mass, double b) {
         static double a[3] = {0, 0, 0};
-        double Vabs=getTotalFromComponents(v);
-        double multiple = -b * pow(2.71828182846, (-1 * r[2] / 8000)) * Vabs / mass;
-        a[0] = multiple * v[0];
-        a[1] = multiple * v[1];
-        a[2] = multiple * v[2] + accelGravity(r);
+        double Vabs = getTotalFromComponents(v);
+        double dragValues = -b * pow(2.71828182846, (-1 * r[2] / 8000)) * Vabs / mass;
+        a[0] = dragValues * v[0];
+        a[1] = dragValues * v[1];
+        a[2] = dragValues * v[2] + accelGravity(r);
         return a;
 }
 
