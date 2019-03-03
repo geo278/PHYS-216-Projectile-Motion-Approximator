@@ -35,12 +35,11 @@ int main() {
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
     double azimuth = 144*PI/180;
     double altitude = 28*PI/180;
-
     double mass = 10;
-    double b = 0.043;
-    // the x direction is aligned along east,y along north, and z along height.
+    double b = 0.043; // drag coefficient
     double range = 0;
 
+    // the x direction is aligned along east,y along north, and z along height.
     double * r = new double[3];
     r[0] = 0;
     r[1] = 0;
@@ -53,9 +52,7 @@ int main() {
     v[2] = getZratio(altitude) * Vmag;
 
     double * a = new double[3];
-    a[0] = 0;
-    a[1] = 0;
-    a[2] = 0;
+    a[0] = 0, a[1] = 0, a[2] = 0;
 
     double t = 0;
     double dt = 0.01; // step size
@@ -65,10 +62,8 @@ int main() {
 
     double * rp = new double[3];
     double * rc = new double[3];
-
     double * vp = new double[3];
     double * vc = new double[3];
-
     double * ap = new double[3];
     double * ac = new double[3];
 
@@ -128,7 +123,7 @@ int main() {
     delete [] vc;
     vc = NULL;
 
-    // acceleration arrays are static, and do not need to be freed
+    // acceleration arrays are static, so they don't need to be freed
     // delete [] a;
     // a = NULL;
     // delete [] ap;
