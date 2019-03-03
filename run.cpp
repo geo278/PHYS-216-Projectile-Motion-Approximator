@@ -30,6 +30,14 @@ double getYratio(double azimuth, double altitude) {
 double getZratio(double altitude) {
     return sin(altitude);
 }
+// Function to find cross product of two vectors. 
+double * crossProduct(int a[], int b[]) { 
+    static double crossProduct[3] = {0, 0, 0};
+    crossProduct[0] = a[1] * b[2] - a[2] * b[1]; 
+    crossProduct[1] = a[0] * b[2] - a[2] * b[0]; 
+    crossProduct[2] = a[0] * b[1] - a[1] * b[0]; 
+    return crossProduct;
+}
 
 int main() {
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
