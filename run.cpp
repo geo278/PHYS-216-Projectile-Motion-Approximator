@@ -4,13 +4,13 @@
 using namespace std;
 #define PI 3.14159265
 
-double getTotalFromComponents(double * vector) {
+double getTotalFromComponents(double vector[]) {
     return sqrt (pow(vector[0], 2) + pow(vector[1], 2) + pow(vector[2], 2));
 }
-double accelGravity(double * r) {
+double accelGravity(double r[]) {
     return -9.8 * pow( (1 + r[2] / 6370000), -2);
 }
-double * accel(double * v, double * r, double mass, double b) {
+double * accel(double v[], double r[], double mass, double b) {
         static double a[3] = {0, 0, 0};
         double Vabs = getTotalFromComponents(v);
         double dragValues = -b * pow(2.71828182846, (-1 * r[2] / 8000)) * Vabs / mass;
@@ -31,7 +31,7 @@ double getZratio(double altitude) {
     return sin(altitude);
 }
 // Function to find cross product of two vectors. 
-double * crossProduct(int a[], int b[]) { 
+double * crossProduct(double a[], double b[]) { 
     static double crossProduct[3] = {0, 0, 0};
     crossProduct[0] = a[1] * b[2] - a[2] * b[1]; 
     crossProduct[1] = a[0] * b[2] - a[2] * b[0]; 
@@ -130,14 +130,7 @@ int main() {
     vp = NULL;
     delete [] vc;
     vc = NULL;
-
     // acceleration arrays are static, so they don't need to be freed
-    // delete [] a;
-    // a = NULL;
-    // delete [] ap;
-    // ap = NULL;
-    // delete [] ac;
-    // ac = NULL;
 
     return 1;
 }
