@@ -19,6 +19,8 @@ double * accel(double * v, double * r, double mass, double b) {
         a[2] = multiple * v[2] + accelGravity(r);
         return a;
 }
+
+// the following helpers will break down the xyz components of any vector using asimuth and altitude
 double getXratio(double azimuth, double altitude) {
     return cos(altitude) * sin(azimuth);
 }
