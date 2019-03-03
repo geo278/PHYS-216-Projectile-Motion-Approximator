@@ -8,19 +8,19 @@ double getTotalFromComponents(double vector[3]) {
     return sqrt (pow(vector[0], 2) + pow(vector[1], 2) + pow(vector[2], 2));
 }
 // Cross product of two vectors. 
-double * crossProduct(double a[3], double b[3]) { 
-    static double crossProduct[3] = {0, 0, 0};
-    crossProduct[0] = a[1] * b[2] - a[2] * b[1]; 
-    crossProduct[1] = a[0] * b[2] - a[2] * b[0]; 
-    crossProduct[2] = a[0] * b[1] - a[1] * b[0]; 
-    return crossProduct;
+double * cross(double a[3], double b[3]) { 
+    static double cross[3] = {0, 0, 0};
+    cross[0] = a[1] * b[2] - a[2] * b[1]; 
+    cross[1] = -1 * (a[0] * b[2] - a[2] * b[0]); 
+    cross[2] = a[0] * b[1] - a[1] * b[0]; 
+    return cross;
 }
-// multiplys scalar a by vector b
-double * scalarVectorMultiply(double a, double b[3]) { 
+// multiplys scalar s by vector v
+double * svMult(double s, double v[3]) { 
     static double result[3] = {0, 0, 0};
-    result[0] = a * b[0]; 
-    result[1] = a * b[1]; 
-    result[2] = a * b[2]; 
+    result[0] = s * v[0]; 
+    result[1] = s * v[1]; 
+    result[2] = s * v[2]; 
     return result;
 }
 double * addVectors(double a[3], double b[3]) { 
@@ -48,8 +48,9 @@ void accel(double a[3], double omega[3], double v[3], double r[3], double mass, 
     a[1] = dragValues * v[1];
     a[2] = dragValues * v[2] + accelGravity(r);
     // corrections for Earth's rotation: a' = a - 2 * omega X v' - omega X (omega X r')
-    a = subVectors(a, addVectors( scalarVectorMultiply(2, crossProduct(omega, v)), crossProduct(omega, crossProduct(omega, r)) ) );
-    //return a;
+    a = subVectors(a, addVectors( svMult(2, cross(omega, v)), cross(omega, cross(omega, r)) ) );
+    cout<<"  aaaaaaaaaaaaaa: "<<a[0];
+    cout<<"  aaaaaaaaaaaaaaT: "<<getTotalFromComponents(a);
 }
 
 // the following helpers will break down the xyz components of any vector using asimuth and altitude
@@ -65,13 +66,13 @@ double getZratio(double altitude) {
 
 int main() {
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
-    double azimuth = 144 * PI/180;
+    double azimuth = 0 * PI/180;
     double altitude = 28 * PI/180;
-    double mass = 10;
-    double b = 0.043; // drag coefficient
+    double mass = 10; // kg
+    double b = 0; // drag coefficient 0.043
     double range = 0;
     double lambda = 49 * PI/180; // lattitude
-    double omegaMag = 0.0000729;
+    double omegaMag = 999.729; // 0.0000729
     double * omega = new double[3]; // angular acceleration, corrected for the east-north-up coordinate system below
     omega[0] = 0;
     omega[1] = cos(lambda) * omegaMag;
@@ -81,10 +82,10 @@ int main() {
     double * r = new double[3];
     r[0] = 0;
     r[1] = 0;
-    r[2] = 4;
+    r[2] = 2; // initial launch height
 
     double * v = new double[3];
-    double Vmag = 100;
+    double Vmag = 300; // launch speed m/s
     v[0] = getXratio(azimuth, altitude) * Vmag;
     v[1] = getYratio(azimuth, altitude) * Vmag;
     v[2] = getZratio(altitude) * Vmag;
@@ -93,7 +94,7 @@ int main() {
     a[0] = 0, a[1] = 0, a[2] = 0;
 
     double t = 0;
-    double dt = 0.01; // step size
+    double dt = 0.001; // step size
 
     ofstream data;
     data.open("data.csv");
@@ -107,6 +108,8 @@ int main() {
 
     while (r[2] > 0) {
         accel(a, omega, v, r, mass, b);
+        cout<<"  aaaaaaaaaaaaaa2: "<<a[0];
+    cout<<"  aaaaaaaaaaaaaaT2: "<<getTotalFromComponents(a);
         for (int i = 0; i < 3; i++) {
             rp[i] = r[i] + v[i] * dt;
             vp[i] = v[i] + a[i] * dt;
@@ -142,7 +145,7 @@ int main() {
             cout<<"  accel: "<<getTotalFromComponents(a);
             cout<<"  x: "<<r[0];
             cout<<"  y: "<<r[1];
-            cout<<"  height: "<<r[2];
+            cout<<"  z: "<<r[2];
         }
 
         data << range <<","<< r[2] <<","<< t <<","<< getTotalFromComponents(a) <<","<< getTotalFromComponents(v) << endl;
