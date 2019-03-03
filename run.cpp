@@ -11,13 +11,13 @@ double accelGravity(double r[]) {
     return -9.8 * pow( (1 + r[2] / 6370000), -2);
 }
 double * accel(double v[], double r[], double mass, double b) {
-        static double a[3] = {0, 0, 0};
-        double Vabs = getTotalFromComponents(v);
-        double dragValues = -b * pow(2.71828182846, (-1 * r[2] / 8000)) * Vabs / mass;
-        a[0] = dragValues * v[0];
-        a[1] = dragValues * v[1];
-        a[2] = dragValues * v[2] + accelGravity(r);
-        return a;
+    static double a[3] = {0, 0, 0};
+    double Vabs = getTotalFromComponents(v);
+    double dragValues = -b * pow(2.71828182846, (-1 * r[2] / 8000)) * Vabs / mass;
+    a[0] = dragValues * v[0];
+    a[1] = dragValues * v[1];
+    a[2] = dragValues * v[2] + accelGravity(r);
+    return a;
 }
 
 // the following helpers will break down the xyz components of any vector using asimuth and altitude
@@ -41,11 +41,17 @@ double * crossProduct(double a[], double b[]) {
 
 int main() {
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
-    double azimuth = 144*PI/180;
-    double altitude = 28*PI/180;
+    double azimuth = 144 * PI/180;
+    double altitude = 28 * PI/180;
     double mass = 10;
     double b = 0.043; // drag coefficient
     double range = 0;
+    double λ = 49 * PI/180; // lattitude
+    double omegaMag = 0.0000729;
+    double * omega = new double[3]; // angular acceleration, corrected for the east-north-up coordinate system below
+    omega[0] = 0;
+    omega[1] = cos(λ) * omegaMag;
+    omega[2] = sin(λ) * omegaMag;
 
     // the x direction is aligned along east,y along north, and z along height.
     double * r = new double[3];
