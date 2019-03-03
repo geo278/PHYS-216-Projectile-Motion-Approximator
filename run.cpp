@@ -44,7 +44,7 @@ double accelGravity(double r[3]) {
 void accel(double a[3], double omega[3], double v[3], double r[3], double mass, double b) {
     double Vabs = getTotalFromComponents(v);
     double dragValues = -b * pow(2.71828182846, (-1 * r[2] / 8000)) * Vabs / mass;
-    a[0] = dragValues * v[0] - 2 * (omega[1] * v[2] - omega[2] * v[1]);
+    a[0] = dragValues * v[0];
     a[1] = dragValues * v[1];
     a[2] = dragValues * v[2] + accelGravity(r);
     // corrections for Earth's rotation: a' = a - 2 * omega X v' - omega X (omega X r')
@@ -94,7 +94,7 @@ int main() {
     a[0] = 0, a[1] = 0, a[2] = 0;
 
     double t = 0;
-    double dt = 0.001; // step size
+    double dt = 0.00003; // step size
 
     ofstream data;
     data.open("data.csv");
