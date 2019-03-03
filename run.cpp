@@ -89,8 +89,6 @@ int main() {
     v[1] = getYratio(azimuth, altitude) * Vmag;
     v[2] = getZratio(altitude) * Vmag;
 
-
-
     double * a = new double[3];
     a[0] = 0, a[1] = 0, a[2] = 0;
 
@@ -152,17 +150,22 @@ int main() {
 
     delete [] r;
     r = NULL;
-    delete [] v;
-    v = NULL;
     delete [] rp;
     rp = NULL;
     delete [] rc;
     rc = NULL;
+    delete [] v;
+    v = NULL;
     delete [] vp;
     vp = NULL;
     delete [] vc;
     vc = NULL;
-    // acceleration arrays are static, so they don't need to be freed
-
+    delete [] a;
+    a = NULL;
+    delete [] ap;
+    ap = NULL;
+    delete [] ac;
+    ac = NULL;
+    
     return 1;
 }
