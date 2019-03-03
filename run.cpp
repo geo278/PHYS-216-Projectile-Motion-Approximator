@@ -41,14 +41,14 @@ double * subVectors(double a[3], double b[3]) {
 double accelGravity(double r[3]) {
     return -9.8 * pow( (1 + r[2] / 6370000), -2);
 }
-void accel(double a[3], double ω[3], double v[3], double r[3], double mass, double b) {
+void accel(double a[3], double omega[3], double v[3], double r[3], double mass, double b) {
     double Vabs = getTotalFromComponents(v);
     double dragValues = -b * pow(2.71828182846, (-1 * r[2] / 8000)) * Vabs / mass;
     a[0] = dragValues * v[0];
     a[1] = dragValues * v[1];
     a[2] = dragValues * v[2] + accelGravity(r);
-    // corrections for Earth's rotation: a' = a - 2 * ω X v' - ω X (ω X r')
-    a = subVectors(a, addVectors( scalarVectorMultiply(2, crossProduct(ω, v)), crossProduct(ω, crossProduct(ω, r)) ) );
+    // corrections for Earth's rotation: a' = a - 2 * omega X v' - omega X (omega X r')
+    a = subVectors(a, addVectors( scalarVectorMultiply(2, crossProduct(omega, v)), crossProduct(omega, crossProduct(omega, r)) ) );
     //return a;
 }
 
@@ -70,12 +70,12 @@ int main() {
     double mass = 10;
     double b = 0.043; // drag coefficient
     double range = 0;
-    double λ = 49 * PI/180; // lattitude
-    double ωMag = 0.0000729;
-    double * ω = new double[3]; // angular acceleration, corrected for the east-north-up coordinate system below
-    ω[0] = 0;
-    ω[1] = cos(λ) * ωMag;
-    ω[2] = sin(λ) * ωMag;
+    double lambda = 49 * PI/180; // lattitude
+    double omegaMag = 0.0000729;
+    double * omega = new double[3]; // angular acceleration, corrected for the east-north-up coordinate system below
+    omega[0] = 0;
+    omega[1] = cos(lambda) * omegaMag;
+    omega[2] = sin(lambda) * omegaMag;
 
     // the x direction is aligned along east,y along north, and z along height.
     double * r = new double[3];
@@ -108,20 +108,20 @@ int main() {
     double * ac = new double[3];
 
     while (r[2] > 0) {
-        accel(a, ω, v, r, mass, b);
+        accel(a, omega, v, r, mass, b);
         for (int i = 0; i < 3; i++) {
             rp[i] = r[i] + v[i] * dt;
             vp[i] = v[i] + a[i] * dt;
         }
 
         // corrector:
-        accel(ap, ω, vp, rp, mass, b);
+        accel(ap, omega, vp, rp, mass, b);
         for (int i = 0; i < 3; i++) {
             rc[i] = r[i] + vp[i] * dt;
             vc[i] = v[i] + ap[i] * dt;
         }
 
-        accel(ac, ω, vc, rc, mass, b);
+        accel(ac, omega, vc, rc, mass, b);
 
         // Average solutions for final values:
         for (int i = 0; i < 3; i++) {
