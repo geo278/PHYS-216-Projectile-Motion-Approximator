@@ -129,24 +129,26 @@ int main() {
 
         data << range <<","<< r[2] <<","<< t <<","<< getTotalFromComponents(a) <<","<< getTotalFromComponents(v) << endl;
 
-        // delete [] r;
-        // r = NULL;
-        // delete [] v;
-        // v = NULL;
-        // delete [] a;
-        // a = NULL;
-        // delete [] rp;
-        // rp = NULL;
-        // delete [] rc;
-        // rc = NULL;
-        // delete [] vp;
-        // vp = NULL;
-        // delete [] vc;
-        // vc = NULL;
-        // delete [] ap;
-        // ap = NULL;
-        // delete [] ac;
-        // ac = NULL;
+
     }
+    delete [] r;
+    r = NULL;
+    delete [] v;
+    v = NULL;
+    // delete [] a;
+    // a = NULL;
+    delete [] rp;
+    rp = NULL;
+    delete [] rc;
+    rc = NULL;
+    delete [] vp;
+    vp = NULL;
+    delete [] vc;
+    vc = NULL;
+    // delete [] ap;
+    // ap = NULL;
+    // delete [] ac;
+    // ac = NULL;
+
     return 1;
 }
