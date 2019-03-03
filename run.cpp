@@ -47,7 +47,7 @@ void accel(double a[3], double ω[3], double v[3], double r[3], double mass, dou
     a[0] = dragValues * v[0];
     a[1] = dragValues * v[1];
     a[2] = dragValues * v[2] + accelGravity(r);
-    // a' = a - 2 * ω X v' - ω X (ω X r')
+    // corrections for Earth's rotation: a' = a - 2 * ω X v' - ω X (ω X r')
     a = subVectors(a, addVectors( scalarVectorMultiply(2, crossProduct(ω, v)), crossProduct(ω, crossProduct(ω, r)) ) );
     //return a;
 }
