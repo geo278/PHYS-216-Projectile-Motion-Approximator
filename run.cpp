@@ -4,20 +4,52 @@
 using namespace std;
 #define PI 3.14159265
 
-double getTotalFromComponents(double vector[]) {
+double getTotalFromComponents(double vector[3]) {
     return sqrt (pow(vector[0], 2) + pow(vector[1], 2) + pow(vector[2], 2));
 }
-double accelGravity(double r[]) {
+// Cross product of two vectors. 
+double * crossProduct(double a[3], double b[3]) { 
+    static double crossProduct[3] = {0, 0, 0};
+    crossProduct[0] = a[1] * b[2] - a[2] * b[1]; 
+    crossProduct[1] = a[0] * b[2] - a[2] * b[0]; 
+    crossProduct[2] = a[0] * b[1] - a[1] * b[0]; 
+    return crossProduct;
+}
+// multiplys scalar a by vector b
+double * scalarVectorMultiply(double a, double b[3]) { 
+    static double result[3] = {0, 0, 0};
+    result[0] = a * b[0]; 
+    result[1] = a * b[1]; 
+    result[2] = a * b[2]; 
+    return result;
+}
+double * addVectors(double a[3], double b[3]) { 
+    static double result[3] = {0, 0, 0};
+    result[0] = a[0] + b[0]; 
+    result[1] = a[1] + b[1]; 
+    result[2] = a[2] + b[2]; 
+    return result;
+}
+double * subVectors(double a[3], double b[3]) { 
+    static double result[3] = {0, 0, 0};
+    result[0] = a[0] - b[0]; 
+    result[1] = a[1] - b[1]; 
+    result[2] = a[2] - b[2]; 
+    return result;
+}
+
+double accelGravity(double r[3]) {
     return -9.8 * pow( (1 + r[2] / 6370000), -2);
 }
-double * accel(double v[], double r[], double mass, double b) {
-    static double a[3] = {0, 0, 0};
+void accel(double a[3], double ω[3], double v[3], double r[3], double mass, double b) {
     double Vabs = getTotalFromComponents(v);
     double dragValues = -b * pow(2.71828182846, (-1 * r[2] / 8000)) * Vabs / mass;
     a[0] = dragValues * v[0];
     a[1] = dragValues * v[1];
     a[2] = dragValues * v[2] + accelGravity(r);
-    return a;
+    // a' = a - 2 * ω X v' - ω X (ω X r')
+    a = subVectors(a, addVectors( scalarVectorMultiply(2, crossProduct(ω, v)), crossProduct(ω, crossProduct(ω, r)) ) );
+    //return a;
 }
 
 // the following helpers will break down the xyz components of any vector using asimuth and altitude
@@ -30,14 +62,6 @@ double getYratio(double azimuth, double altitude) {
 double getZratio(double altitude) {
     return sin(altitude);
 }
-// Function to find cross product of two vectors. 
-double * crossProduct(double a[], double b[]) { 
-    static double crossProduct[3] = {0, 0, 0};
-    crossProduct[0] = a[1] * b[2] - a[2] * b[1]; 
-    crossProduct[1] = a[0] * b[2] - a[2] * b[0]; 
-    crossProduct[2] = a[0] * b[1] - a[1] * b[0]; 
-    return crossProduct;
-}
 
 int main() {
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
@@ -47,11 +71,11 @@ int main() {
     double b = 0.043; // drag coefficient
     double range = 0;
     double λ = 49 * PI/180; // lattitude
-    double omegaMag = 0.0000729;
-    double * omega = new double[3]; // angular acceleration, corrected for the east-north-up coordinate system below
-    omega[0] = 0;
-    omega[1] = cos(λ) * omegaMag;
-    omega[2] = sin(λ) * omegaMag;
+    double ωMag = 0.0000729;
+    double * ω = new double[3]; // angular acceleration, corrected for the east-north-up coordinate system below
+    ω[0] = 0;
+    ω[1] = cos(λ) * ωMag;
+    ω[2] = sin(λ) * ωMag;
 
     // the x direction is aligned along east,y along north, and z along height.
     double * r = new double[3];
@@ -64,6 +88,8 @@ int main() {
     v[0] = getXratio(azimuth, altitude) * Vmag;
     v[1] = getYratio(azimuth, altitude) * Vmag;
     v[2] = getZratio(altitude) * Vmag;
+
+
 
     double * a = new double[3];
     a[0] = 0, a[1] = 0, a[2] = 0;
@@ -82,20 +108,20 @@ int main() {
     double * ac = new double[3];
 
     while (r[2] > 0) {
-        a = accel(v, r, mass, b);
+        accel(a, ω, v, r, mass, b);
         for (int i = 0; i < 3; i++) {
             rp[i] = r[i] + v[i] * dt;
             vp[i] = v[i] + a[i] * dt;
         }
 
         // corrector:
-        ap = accel(vp, rp, mass, b);
+        accel(ap, ω, vp, rp, mass, b);
         for (int i = 0; i < 3; i++) {
             rc[i] = r[i] + vp[i] * dt;
             vc[i] = v[i] + ap[i] * dt;
         }
 
-        ac = accel(vc, rc, mass, b);
+        accel(ac, ω, vc, rc, mass, b);
 
         // Average solutions for final values:
         for (int i = 0; i < 3; i++) {
