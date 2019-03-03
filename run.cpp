@@ -9,7 +9,7 @@ double getTotalFromComponents(double vector[3]) {
 }
 // Cross product of two vectors. 
 double * cross(double a[3], double b[3]) { 
-    static double cross[3] = {0, 0, 0};
+    static double cross[3];
     cross[0] = a[1] * b[2] - a[2] * b[1]; 
     cross[1] = -1 * (a[0] * b[2] - a[2] * b[0]); 
     cross[2] = a[0] * b[1] - a[1] * b[0]; 
@@ -17,21 +17,21 @@ double * cross(double a[3], double b[3]) {
 }
 // multiplys scalar s by vector v
 double * svMult(double s, double v[3]) { 
-    static double result[3] = {0, 0, 0};
+    static double result[3];
     result[0] = s * v[0]; 
     result[1] = s * v[1]; 
     result[2] = s * v[2]; 
     return result;
 }
 double * addVectors(double a[3], double b[3]) { 
-    static double result[3] = {0, 0, 0};
+    static double result[3];
     result[0] = a[0] + b[0]; 
     result[1] = a[1] + b[1]; 
     result[2] = a[2] + b[2]; 
     return result;
 }
 double * subVectors(double a[3], double b[3]) { 
-    static double result[3] = {0, 0, 0};
+    static double result[3];
     result[0] = a[0] - b[0]; 
     result[1] = a[1] - b[1]; 
     result[2] = a[2] - b[2]; 
@@ -44,13 +44,13 @@ double accelGravity(double r[3]) {
 void accel(double a[3], double omega[3], double v[3], double r[3], double mass, double b) {
     double Vabs = getTotalFromComponents(v);
     double dragValues = -b * pow(2.71828182846, (-1 * r[2] / 8000)) * Vabs / mass;
-    a[0] = dragValues * v[0];
+    a[0] = dragValues * v[0] - 2 * (omega[1] * v[2] - omega[2] * v[1]);
     a[1] = dragValues * v[1];
     a[2] = dragValues * v[2] + accelGravity(r);
     // corrections for Earth's rotation: a' = a - 2 * omega X v' - omega X (omega X r')
-    a = subVectors(a, addVectors( svMult(2, cross(omega, v)), cross(omega, cross(omega, r)) ) );
-    cout<<"  aaaaaaaaaaaaaa: "<<a[0];
-    cout<<"  aaaaaaaaaaaaaaT: "<<getTotalFromComponents(a);
+    a[0] = subVectors(a, addVectors( svMult(2, cross(omega, v)), cross(omega, cross(omega, r)) ) )[0];
+    a[1] = subVectors(a, addVectors( svMult(2, cross(omega, v)), cross(omega, cross(omega, r)) ) )[1];
+    a[2] = subVectors(a, addVectors( svMult(2, cross(omega, v)), cross(omega, cross(omega, r)) ) )[2];
 }
 
 // the following helpers will break down the xyz components of any vector using asimuth and altitude
@@ -66,13 +66,13 @@ double getZratio(double altitude) {
 
 int main() {
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
-    double azimuth = 0 * PI/180;
+    double azimuth = 144 * PI/180;
     double altitude = 28 * PI/180;
     double mass = 10; // kg
     double b = 0; // drag coefficient 0.043
     double range = 0;
     double lambda = 49 * PI/180; // lattitude
-    double omegaMag = 999.729; // 0.0000729
+    double omegaMag = 0.0000729; // 0.0000729
     double * omega = new double[3]; // angular acceleration, corrected for the east-north-up coordinate system below
     omega[0] = 0;
     omega[1] = cos(lambda) * omegaMag;
@@ -82,10 +82,10 @@ int main() {
     double * r = new double[3];
     r[0] = 0;
     r[1] = 0;
-    r[2] = 2; // initial launch height
+    r[2] = 4; // initial launch height
 
     double * v = new double[3];
-    double Vmag = 300; // launch speed m/s
+    double Vmag = 100; // launch speed m/s
     v[0] = getXratio(azimuth, altitude) * Vmag;
     v[1] = getYratio(azimuth, altitude) * Vmag;
     v[2] = getZratio(altitude) * Vmag;
@@ -108,8 +108,6 @@ int main() {
 
     while (r[2] > 0) {
         accel(a, omega, v, r, mass, b);
-        cout<<"  aaaaaaaaaaaaaa2: "<<a[0];
-    cout<<"  aaaaaaaaaaaaaaT2: "<<getTotalFromComponents(a);
         for (int i = 0; i < 3; i++) {
             rp[i] = r[i] + v[i] * dt;
             vp[i] = v[i] + a[i] * dt;
