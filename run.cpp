@@ -94,7 +94,7 @@ int main() {
     a[0] = 0, a[1] = 0, a[2] = 0;
 
     double t = 0; // seconds
-    double dt = 0.00002; // step size
+    double dt = 0.001; // step size
 
     ofstream data;
     data.open("data.csv");
@@ -145,7 +145,7 @@ int main() {
             cout<<"  z: "<<r[2];
         }
 
-        data << range <<","<< r[2] <<","<< t <<","<< getTotalFromComponents(a) <<","<< getTotalFromComponents(v) << endl;
+        data << r[0] <<","<< r[1] <<","<< t <<","<< getTotalFromComponents(a) <<","<< getTotalFromComponents(v) << endl;
     }
 
     delete [] r;
