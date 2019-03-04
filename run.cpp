@@ -66,10 +66,10 @@ double getZratio(double altitude) {
 
 int main() {
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
-    double azimuth = 0 * PI/180;
+    double azimuth = 144 * PI/180;
     double altitude = 28 * PI/180;
     double mass = 10; // kg
-    double b = 0; // drag coefficient 0.043
+    double b = 0.043; // drag coefficient 0.043
     double range = 0;
     double lambda = 49 * PI/180; // lattitude
     double omegaMag = 0.0000729; // 0.0000729
@@ -82,10 +82,10 @@ int main() {
     double * r = new double[3];
     r[0] = 0;
     r[1] = 0;
-    r[2] = 2; // initial launch height
+    r[2] = 4; // initial launch height
 
     double * v = new double[3];
-    double Vmag = 300; // launch speed m/s
+    double Vmag = 200; // launch speed m/s
     v[0] = getXratio(azimuth, altitude) * Vmag;
     v[1] = getYratio(azimuth, altitude) * Vmag;
     v[2] = getZratio(altitude) * Vmag;
