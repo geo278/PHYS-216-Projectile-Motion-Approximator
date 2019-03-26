@@ -41,7 +41,7 @@ double * subVectors(double a[3], double b[3]) {
 double accelGravity(double r[3]) {
     return -9.8 * pow( (1 + r[2] / 6370000), -2);
 }
-void accel(double a[3], double omega[3], double v[3], double r[3], double mass, double b) {
+void accel(double a[3], double omega[3], double v[3], double r[3], double mass, double burnRate, double b) {
     double Vabs = getTotalFromComponents(v);
     double dragValues = -b * pow(2.71828182846, (-1 * r[2] / 8000)) * Vabs / mass;
     a[0] = dragValues * v[0];
@@ -51,6 +51,10 @@ void accel(double a[3], double omega[3], double v[3], double r[3], double mass, 
     a[0] = subVectors(a, addVectors(svMult(2, cross(omega, v)), cross(omega, cross(omega, r))))[0];
     a[1] = subVectors(a, addVectors(svMult(2, cross(omega, v)), cross(omega, cross(omega, r))))[1];
     a[2] = subVectors(a, addVectors(svMult(2, cross(omega, v)), cross(omega, cross(omega, r))))[2];
+    // rocket is propelled in direction of v, a = mDot * V / mass
+    a[0] += burnRate * v[0] / mass;
+    a[1] += burnRate * v[1] / mass;
+    a[2] += burnRate * v[2] / mass;
 }
 
 // the following helpers will break down the xyz components of initial velocity using asimuth and altitude
@@ -68,7 +72,8 @@ int main() {
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
     double altitude = 60 * PI/180;
     double azimuth = 0 * PI/180;
-    double mass = 10; // kg
+    double mass = 10; // kg, half is chemical propellant
+    double burnRate = -0.25; // kg/s
     double b = 0.0025; // drag coefficient 0.043
     double range = 0;
     double lambda = 49 * PI/180; // lattitude
@@ -107,20 +112,20 @@ int main() {
     double * ac = new double[3];
 
     while (r[2] > 0) {
-        accel(a, omega, v, r, mass, b);
+        accel(a, omega, v, r, mass, burnRate, b);
         for (int i = 0; i < 3; i++) {
             rp[i] = r[i] + v[i] * dt;
             vp[i] = v[i] + a[i] * dt;
         }
 
         // corrector:
-        accel(ap, omega, vp, rp, mass, b);
+        accel(ap, omega, vp, rp, mass, burnRate, b);
         for (int i = 0; i < 3; i++) {
             rc[i] = r[i] + vp[i] * dt;
             vc[i] = v[i] + ap[i] * dt;
         }
 
-        accel(ac, omega, vc, rc, mass, b);
+        accel(ac, omega, vc, rc, mass, burnRate, b);
 
         // Average solutions for final values:
         for (int i = 0; i < 3; i++) {
@@ -130,6 +135,8 @@ int main() {
         }
 
         range = sqrt(r[0]*r[0] + r[1]*r[1]);
+
+        mass += burnRate * t;
         t += dt;
 
         if (r[2] < 0.1) {
