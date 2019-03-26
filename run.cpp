@@ -47,14 +47,15 @@ void accel(double a[3], double omega[3], double v[3], double r[3], double mass, 
     a[0] = dragValues * v[0];
     a[1] = dragValues * v[1];
     a[2] = dragValues * v[2] + accelGravity(r);
+    // rocket is propelled in direction of v, a = mDot * V / mass
+    double thrustMag = burnRate * 2000 / mass;
+    a[0] += thrustMag * v[0] / Vabs;
+    a[1] += thrustMag * v[1] / Vabs;
+    a[2] += thrustMag * v[2] / Vabs;
     // corrections for Earth's rotation: a' = a - 2 * omega X v' - omega X (omega X r')
     a[0] = subVectors(a, addVectors(svMult(2, cross(omega, v)), cross(omega, cross(omega, r))))[0];
     a[1] = subVectors(a, addVectors(svMult(2, cross(omega, v)), cross(omega, cross(omega, r))))[1];
     a[2] = subVectors(a, addVectors(svMult(2, cross(omega, v)), cross(omega, cross(omega, r))))[2];
-    // rocket is propelled in direction of v, a = mDot * V / mass
-    a[0] += burnRate * v[0] / mass;
-    a[1] += burnRate * v[1] / mass;
-    a[2] += burnRate * v[2] / mass;
 }
 
 // the following helpers will break down the xyz components of initial velocity using asimuth and altitude
@@ -73,7 +74,7 @@ int main() {
     double altitude = 60 * PI/180;
     double azimuth = 0 * PI/180;
     double mass = 10; // kg, half is chemical propellant
-    double burnRate = -0.25; // kg/s
+    double burnRate = 0.25; // kg/s
     double b = 0.0025; // drag coefficient 0.043
     double range = 0;
     double lambda = 49 * PI/180; // lattitude
@@ -90,7 +91,7 @@ int main() {
     r[2] = 4; // initial launch height (meters)
 
     double * v = new double[3];
-    double Vmag = 200; // launch speed m/s
+    double Vmag = 10; // launch speed m/s
     v[0] = getXratio(azimuth, altitude) * Vmag;
     v[1] = getYratio(azimuth, altitude) * Vmag;
     v[2] = getZratio(altitude) * Vmag;
@@ -136,7 +137,7 @@ int main() {
 
         range = sqrt(r[0]*r[0] + r[1]*r[1]);
         if (mass > 5) {
-            mass += burnRate * t;
+            mass -= burnRate * t;
         }
         t += dt;
 
