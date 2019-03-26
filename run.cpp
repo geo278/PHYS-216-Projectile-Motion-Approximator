@@ -66,10 +66,10 @@ double getZratio(double altitude) {
 
 int main() {
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
-    double azimuth = 144 * PI/180;
-    double altitude = 28 * PI/180;
+    double altitude = 60 * PI/180;
+    double azimuth = 0 * PI/180;
     double mass = 10; // kg
-    double b = 0.043; // drag coefficient 0.043
+    double b = 0.0025; // drag coefficient 0.043
     double range = 0;
     double lambda = 49 * PI/180; // lattitude
     double omegaMag = 0.0000729; // 0.0000729
