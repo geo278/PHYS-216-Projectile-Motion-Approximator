@@ -87,7 +87,7 @@ int main() {
     double * r = new double[3];
     r[0] = 0;
     r[1] = 0;
-    r[2] = 4; // initial launch height
+    r[2] = 4; // initial launch height (meters)
 
     double * v = new double[3];
     double Vmag = 200; // launch speed m/s
@@ -135,8 +135,9 @@ int main() {
         }
 
         range = sqrt(r[0]*r[0] + r[1]*r[1]);
-
-        mass += burnRate * t;
+        if (mass > 5) {
+            mass += burnRate * t;
+        }
         t += dt;
 
         if (r[2] < 0.1) {
@@ -150,6 +151,7 @@ int main() {
             cout<<"  x: "<<r[0];
             cout<<"  y: "<<r[1];
             cout<<"  z: "<<r[2];
+            cout<<"  //// ";
         }
 
         data << r[0] <<","<< r[1] <<","<< t <<","<< getTotalFromComponents(a) <<","<< getTotalFromComponents(v) << endl;
