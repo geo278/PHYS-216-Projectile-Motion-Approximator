@@ -117,7 +117,7 @@ int main() {
     double * ac = new double[3];
 
     double t = 0; // seconds
-    double dt = 0.1; // step size
+    double dt = 0.001; // step size
 
     while (r[2] > 0) {
         accel(a, omega, lambda, v, r, mass, massFuel, burnRate, b);
