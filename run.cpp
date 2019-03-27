@@ -41,21 +41,25 @@ double * subVectors(double a[3], double b[3]) {
 double accelGravity(double r[3]) {
     return -9.8 * pow( (1 + r[2] / 6370000), -2);
 }
-void accel(double a[3], double omega[3], double v[3], double r[3], double mass, double burnRate, double b) {
+void accel(double a[3], double omega[3], double lambda, double v[3], double r[3], double mass, double burnRate, double b) {
     double Vabs = getTotalFromComponents(v);
     double dragValues = -b * pow(2.71828182846, (-1 * r[2] / 8000)) * Vabs / mass;
     a[0] = dragValues * v[0];
     a[1] = dragValues * v[1];
     a[2] = dragValues * v[2] + accelGravity(r);
-    // rocket is propelled in direction of v, a = mDot * V / mass
+    // rocket is propelled in direction of v, a = mDot * V / mass :
     double thrustMag = burnRate * 2000 / mass;
     a[0] += thrustMag * v[0] / Vabs;
     a[1] += thrustMag * v[1] / Vabs;
     a[2] += thrustMag * v[2] / Vabs;
-    // corrections for Earth's rotation: a' = a - 2 * omega X v' - omega X (omega X r')
+    // corrections for Earth's rotation: a' = a - 2 * omega X v' - omega X (omega X r') :
     a[0] = subVectors(a, addVectors(svMult(2, cross(omega, v)), cross(omega, cross(omega, r))))[0];
     a[1] = subVectors(a, addVectors(svMult(2, cross(omega, v)), cross(omega, cross(omega, r))))[1];
     a[2] = subVectors(a, addVectors(svMult(2, cross(omega, v)), cross(omega, cross(omega, r))))[2];
+    // Non-interial term: A=ω^2 R cosλsinλ en − ω^2 R (cosλ)^2 eup
+    double omegaSquared = getTotalFromComponents(omega) * getTotalFromComponents(omega);
+    a[1] -= omegaSquared * 6371000 * cos(lambda) * sin(lambda);
+    a[2] -= omegaSquared * 6371000 * pow(cos(lambda), 2);
 }
 
 // the following helpers will break down the xyz components of initial velocity using asimuth and altitude
@@ -113,20 +117,20 @@ int main() {
     double * ac = new double[3];
 
     while (r[2] > 0) {
-        accel(a, omega, v, r, mass, burnRate, b);
+        accel(a, omega, lambda, v, r, mass, burnRate, b);
         for (int i = 0; i < 3; i++) {
             rp[i] = r[i] + v[i] * dt;
             vp[i] = v[i] + a[i] * dt;
         }
 
         // corrector:
-        accel(ap, omega, vp, rp, mass, burnRate, b);
+        accel(ap, omega, lambda, vp, rp, mass, burnRate, b);
         for (int i = 0; i < 3; i++) {
             rc[i] = r[i] + vp[i] * dt;
             vc[i] = v[i] + ap[i] * dt;
         }
 
-        accel(ac, omega, vc, rc, mass, burnRate, b);
+        accel(ac, omega, lambda, vc, rc, mass, burnRate, b);
 
         // Average solutions for final values:
         for (int i = 0; i < 3; i++) {
