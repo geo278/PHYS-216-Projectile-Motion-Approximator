@@ -163,7 +163,13 @@ int main() {
             cout<<"  //// ";
         }
 
-        data << r[0] <<","<< r[1] <<","<< t <<","<< getTotalFromComponents(a) <<","<< getTotalFromComponents(v) << endl;
+        data 
+        << r[0] <<","<< r[1] 
+        <<","<< getTotalFromComponents(v) <<","<< t 
+        <<","<< getTotalFromComponents(a) <<","<< t 
+        <<","<< r[2] <<","<< t 
+        <<","<< r[2] <<","<< range 
+        << endl;
     }
 
     delete [] r;
