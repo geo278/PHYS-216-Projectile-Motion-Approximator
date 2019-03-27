@@ -116,8 +116,9 @@ int main() {
     double * ap = new double[3];
     double * ac = new double[3];
 
+    // TIME /////////////////////////////////////////////////////////////
     double t = 0; // seconds
-    double dt = 0.001; // step size
+    double dt = 0.1; // step size
 
     while (r[2] > 0) {
         accel(a, omega, lambda, v, r, mass, massFuel, burnRate, b);
@@ -164,11 +165,11 @@ int main() {
         }
 
         data 
-        << r[0] <<","<< r[1] 
-        <<","<< getTotalFromComponents(v) <<","<< t 
-        <<","<< getTotalFromComponents(a) <<","<< t 
-        <<","<< r[2] <<","<< t 
-        <<","<< r[2] <<","<< range 
+        << r[0] <<","<< r[1] //ab
+        <<","<< getTotalFromComponents(v) <<","<< t //cd
+        <<","<< getTotalFromComponents(a) <<","<< t //ef
+        <<","<< r[2] <<","<< t //gh
+        <<","<< r[2] <<","<< range //ij
         << endl;
     }
 
