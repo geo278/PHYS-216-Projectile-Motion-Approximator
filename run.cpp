@@ -41,17 +41,19 @@ double * subVectors(double a[3], double b[3]) {
 double accelGravity(double r[3]) {
     return -9.8 * pow( (1 + r[2] / 6370000), -2);
 }
-void accel(double a[3], double omega[3], double lambda, double v[3], double r[3], double mass, double burnRate, double b) {
+void accel(double a[3], double omega[3], double lambda, double v[3], double r[3], double mass, double massFuel, double burnRate, double b) {
     double Vabs = getTotalFromComponents(v);
     double dragValues = -b * pow(2.71828182846, (-1 * r[2] / 8000)) * Vabs / mass;
     a[0] = dragValues * v[0];
     a[1] = dragValues * v[1];
     a[2] = dragValues * v[2] + accelGravity(r);
     // rocket is propelled in direction of v, a = mDot * V / mass :
-    double thrustMag = burnRate * 2000 / mass;
-    a[0] += thrustMag * v[0] / Vabs;
-    a[1] += thrustMag * v[1] / Vabs;
-    a[2] += thrustMag * v[2] / Vabs;
+    if (massFuel > 0) {
+        double thrustMag = burnRate * 2000 / mass;
+        a[0] += thrustMag * v[0] / Vabs;
+        a[1] += thrustMag * v[1] / Vabs;
+        a[2] += thrustMag * v[2] / Vabs;
+    }
     // corrections for Earth's rotation: a' = a - 2 * omega X v' - omega X (omega X r') :
     a[0] = subVectors(a, addVectors(svMult(2, cross(omega, v)), cross(omega, cross(omega, r))))[0];
     a[1] = subVectors(a, addVectors(svMult(2, cross(omega, v)), cross(omega, cross(omega, r))))[1];
@@ -75,9 +77,10 @@ double getZratio(double altitude) {
 
 int main() {
     // an azimuth of 90◦ is east, 180◦ is south, and 270◦ is west, 0 is north
-    double altitude = 60 * PI/180;
-    double azimuth = 0 * PI/180;
+    double altitude = 80 * PI/180;
+    double azimuth = 180 * PI/180;
     double mass = 10; // kg, half is chemical propellant
+    double massFuel = 5;
     double burnRate = 0.25; // kg/s
     double b = 0.0025; // drag coefficient 0.043
     double range = 0;
@@ -103,9 +106,6 @@ int main() {
     double * a = new double[3];
     a[0] = 0, a[1] = 0, a[2] = 0;
 
-    double t = 0; // seconds
-    double dt = 0.001; // step size
-
     ofstream data;
     data.open("data.csv");
 
@@ -116,21 +116,24 @@ int main() {
     double * ap = new double[3];
     double * ac = new double[3];
 
+    double t = 0; // seconds
+    double dt = 0.1; // step size
+
     while (r[2] > 0) {
-        accel(a, omega, lambda, v, r, mass, burnRate, b);
+        accel(a, omega, lambda, v, r, mass, massFuel, burnRate, b);
         for (int i = 0; i < 3; i++) {
             rp[i] = r[i] + v[i] * dt;
             vp[i] = v[i] + a[i] * dt;
         }
 
         // corrector:
-        accel(ap, omega, lambda, vp, rp, mass, burnRate, b);
+        accel(ap, omega, lambda, vp, rp, mass, massFuel, burnRate, b);
         for (int i = 0; i < 3; i++) {
             rc[i] = r[i] + vp[i] * dt;
             vc[i] = v[i] + ap[i] * dt;
         }
 
-        accel(ac, omega, lambda, vc, rc, mass, burnRate, b);
+        accel(ac, omega, lambda, vc, rc, mass, massFuel, burnRate, b);
 
         // Average solutions for final values:
         for (int i = 0; i < 3; i++) {
@@ -140,8 +143,9 @@ int main() {
         }
 
         range = sqrt(r[0]*r[0] + r[1]*r[1]);
-        if (mass > 5) {
-            mass -= burnRate * t;
+        if (massFuel > 0) {
+            mass -= burnRate * dt;
+            massFuel -= burnRate * dt;
         }
         t += dt;
 
